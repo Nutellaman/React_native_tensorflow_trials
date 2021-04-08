@@ -35,6 +35,7 @@ export default function App() {
   //Tensorflow and Permissions
   const [mobilenetModel, setMobilenetModel] = useState(null);
   const [frameworkReady, setFrameworkReady] = useState(false);
+  const [valorPrediccion, setvalorPrediccion] = useState("No encontrado");
 
   //defaults
 
@@ -181,14 +182,16 @@ export default function App() {
     if(!prediction || prediction.length === 0) { return; }
     
     //only attempt translation when confidence is higher than 20%
-    if(prediction[0].probability > 0.3) {
+    if(prediction[0].probability > 0.5) {
 
       //stop looping!
-      cancelAnimationFrame(requestAnimationFrameId);
+      //cancelAnimationFrame(requestAnimationFrameId);
+      setvalorPrediccion(prediction[0].className);
+      console.log(prediction[0].className);
       setPredictionFound(true);
 
       //get translation!
-      await getTranslation(prediction[0].className);
+     // await getTranslation(prediction[0].className);
     }
   }
 
@@ -215,6 +218,7 @@ export default function App() {
   const loadNewTranslation = () => {
     setTranslation('');
     setWord('');
+    setvalorPrediccion('No encontrado');
     setPredictionFound(false);
     setTranslationAvailable(false);
   }
@@ -281,25 +285,40 @@ export default function App() {
                   onReady={(imageAsTensors) => handleCameraStream(imageAsTensors)}
                   autorender={true}
                 />
-                <Text style={styles.legendTextField}>Point to any object and get its {availableLanguages.find(al => al.value === language).label } translation</Text>
+                
             </View>;
   }
-
+  // <Text style={styles.legendTextField}>Point to any object and get its {availableLanguages.find(al => al.value === language).label } translation</Text>
+  //<Text style={styles.legendTextField}>Prediccion: {valorPrediccion} </Text>
+  //<Button color='#9400D3' title="Check new word" onPress={() => loadNewTranslation()}/>
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>
-          My Pictionary
+          My Pictionary 
         </Text>
       </View>
 
       <View style={styles.body}>
-        { showLanguageDropdown() }
+        <Button color='#9400D3' title="Check new word" onPress={() => loadNewTranslation()}/>
         {translationAvailable ? showTranslationView() : renderCameraView() }
-      </View>  
+        
+      </View> 
+
+      <View>
+        <Text style={styles.legendTextField}>Prediccion: {valorPrediccion}
+        </Text>
+      </View> 
+
+
     </View>
   );
 }
+
+/*<View style={styles.body}>
+       { showLanguageDropdown() }
+        <Button color='#9400D3' title="Check new word" onPress={() => loadNewTranslation()}/>
+        {translationAvailable ? showTranslationView() : renderCameraView() } */
 
 const styles = StyleSheet.create({
   container: {
@@ -359,7 +378,7 @@ const styles = StyleSheet.create({
   },
   legendTextField: {
     fontStyle: 'italic',
-    color: '#888888'
+    color: '#000000'
   },
   inputAndroid: {
     fontSize: 16,
